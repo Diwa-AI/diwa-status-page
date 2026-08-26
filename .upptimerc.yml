@@ -1,31 +1,31 @@
-# Change these first
-owner: upptime # Your GitHub organization or username, where this repository lives
-repo: upptime # The name of this repository
+# Upptime configuration for the Diwa AI public status page.
+#
+# This file is NOT consumed by this Rails app. It's the config to copy into
+# the root of the separate public GitHub repo created from the
+# `upptime/upptime` template (see README.md in this folder for the full
+# setup steps). Fill in `owner` and `repo` before pushing.
 
+owner: jasper-diwa-ai
+repo: diwa-status
+
+# Endpoints to monitor. v1 only checks external, customer-facing URLs -
+# no internal component breakdown (DB/Redis/Sidekiq), per DIWA-543.
 sites:
-  - name: Google
-    url: https://www.google.com
-  - name: Wikipedia
-    url: https://en.wikipedia.org
-  - name: Hacker News
-    url: https://news.ycombinator.com
-  - name: Secret Site
-    url: $SECRET_SITE
+  - name: Website
+    url: https://www.diwa.ai
 
+# Status website settings (the static page generated on the gh-pages branch).
 status-website:
-  # Add your custom domain name, or remove the `cname` line if you don't have a domain
-  # Uncomment the `baseUrl` line if you don't have a custom domain and add your repo name there
-  cname: demo.upptime.js.org
-  # baseUrl: /your-repo-name
-  logoUrl: https://raw.githubusercontent.com/upptime/upptime.js.org/master/static/img/icon.svg
-  name: Upptime
-  introTitle: "**Upptime** is the open-source uptime monitor and status page, powered entirely by GitHub."
-  introMessage: This is a sample status page which uses **real-time** data from our [GitHub repository](https://github.com/upptime/upptime). No server required — just GitHub Actions, Issues, and Pages. [**Get your own for free**](https://github.com/upptime/upptime)
-  navbar:
-    - title: Status
-      href: /
-    - title: GitHub
-      href: https://github.com/$OWNER/$REPO
+  cname: status.diwa.ai
+  name: Diwa AI Status
+  introMessage: >
+    This page updates automatically from live checks against Diwa AI's
+    public services.
 
-# Upptime also supports notifications, assigning issues, and more
-# See https://upptime.js.org/docs/configuration
+# Optional: uncomment to have Upptime post to a Slack webhook when a check
+# fails/recovers. Requires a `SLACK_WEBHOOK_URL` repository secret. Not
+# required for v1 - customer email/SMS subscriptions are an explicit
+# non-goal, but this is a low-effort way to get internal alerting for free.
+# notifications:
+#   - type: slack
+#     url: $SLACK_WEBHOOK_URL
