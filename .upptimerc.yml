@@ -1,23 +1,37 @@
 # Upptime configuration for the Diwa AI public status page.
 #
-# This file is NOT consumed by this Rails app. It's the config to copy into
-# the root of the separate public GitHub repo created from the
-# `upptime/upptime` template (see README.md in this folder for the full
-# setup steps). Fill in `owner` and `repo` before pushing.
+# This is the live config for the jasper-diwa-ai/diwa-status repo: the
+# `.github/workflows/*.yml` files read this to run checks, build the status
+# site, and update README.md/history/api/graphs. Edit this file and push -
+# no other setup is required.
 
 owner: jasper-diwa-ai
 repo: diwa-status
 
-# Endpoints to monitor. v1 only checks external, customer-facing URLs -
-# no internal component breakdown (DB/Redis/Sidekiq), per DIWA-543.
+# Endpoints to monitor. v1 only checks external, customer-facing URLs that
+# actually have a live, public address today - no internal component
+# breakdown (DB/Redis/Sidekiq/AI pipeline internals), per DIWA-543.
+#
+# The Status Page.pdf mockup (DIWA-543) also shows "Web App & Dashboard"
+# (app.diwa.ai), "API" (api.diwa.ai), and three AI pipeline stages (AI
+# Analysis Engine, Highlight Reel Processing, Transcription Service).
+# Intentionally NOT added yet:
+#   - app.diwa.ai / api.diwa.ai currently have no public DNS record, so
+#     Upptime can't check them (would just show as permanently down).
+#   - The AI pipeline stages are internal processing components with no
+#     public HTTP endpoint, and are an explicit v1 non-goal in TICKET.md.
+# Once a subdomain goes live, add it here as a new `sites` entry.
 sites:
-  - name: Website
+  - name: Marketing Website
     url: https://www.diwa.ai
 
 # Status website settings (the static page generated on the gh-pages branch).
 status-website:
   baseUrl: /diwa-status
   name: Diwa AI Status
+  navbar:
+    - title: diwa.ai
+      href: https://www.diwa.ai
   introMessage: >
     This page updates automatically from live checks against Diwa AI's
     public services.
