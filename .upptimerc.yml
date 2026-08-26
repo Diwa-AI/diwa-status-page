@@ -16,6 +16,7 @@ sites:
 
 # Status website settings (the static page generated on the gh-pages branch).
 status-website:
+  baseUrl: /diwa-status
   name: Diwa AI Status
   introMessage: >
     This page updates automatically from live checks against Diwa AI's
