@@ -113,15 +113,15 @@
     return Math.round(uptime * 100) / 100;
   }
 
-  function isIncidentIssue(issue, siteName) {
+  function isIncidentIssue(issue, siteNames) {
     const title = issue.title || "";
     return (
-      title.includes(siteName) &&
+      siteNames.some((name) => title.includes(name)) &&
       (title.includes("is down") || title.includes("has degraded performance"))
     );
   }
 
-  async function loadIncidents({ owner, repo, siteName }) {
+  async function loadIncidents({ owner, repo, siteNames }) {
     let issues;
     try {
       issues = await fetchJson(
@@ -133,7 +133,7 @@
     }
 
     const incidentIssues = issues.filter((issue) =>
-      isIncidentIssue(issue, siteName)
+      isIncidentIssue(issue, siteNames)
     );
 
     const incidents = [];
@@ -197,28 +197,55 @@
     }
   }
 
-  function renderHero(site, links) {
-    const copy = STATUS_COPY[site.status] || STATUS_COPY.up;
+  // Overall page status/uptime reflect the least healthy monitored service.
+  const STATUS_SEVERITY = { up: 0, degraded: 1, down: 2 };
+
+  function worstStatus(sites) {
+    return sites.reduce(
+      (worst, site) =>
+        STATUS_SEVERITY[site.status] > STATUS_SEVERITY[worst] ? site.status : worst,
+      "up"
+    );
+  }
+
+  function renderHero(sites, links) {
+    const overallStatus = worstStatus(sites);
+    const copy = STATUS_COPY[overallStatus] || STATUS_COPY.up;
+    const mostRecentCheck = sites
+      .map((site) => site.lastUpdated)
+      .filter(Boolean)
+      .sort()
+      .pop();
+    const uptimes = sites
+      .map((site) => site.uptime90d)
+      .filter((value) => value !== null);
+
     document.getElementById("hero-icon").className = `hero-icon ${copy.cls}`;
     document.getElementById("hero-title").textContent = copy.title;
     document.getElementById(
       "hero-subtitle"
     ).textContent = `Last checked ${timeAgo(
-      site.lastUpdated
+      mostRecentCheck
     )} · checks run automatically every 5 minutes`;
 
     const pill = document.getElementById("uptime-pill");
-    pill.textContent =
-      site.uptime90d === null
-        ? "Collecting uptime data — monitoring just started"
-        : `${site.uptime90d.toFixed(2)}% uptime — last 90 days`;
+    pill.textContent = uptimes.length === 0
+      ? "Collecting uptime data — monitoring just started"
+      : `${Math.min(...uptimes).toFixed(2)}% uptime — last 90 days`;
 
     document.getElementById("github-button").href = links.github;
     document.getElementById("rss-button").href = links.rss;
   }
 
-  function renderServices(site) {
+  function renderServices(sites) {
     const container = document.getElementById("services");
+    container.innerHTML = "";
+    for (const site of sites) {
+      renderServiceRow(container, site);
+    }
+  }
+
+  function renderServiceRow(container, site) {
     const copy = STATUS_COPY[site.status] || STATUS_COPY.up;
 
     const row = document.createElement("div");
@@ -326,39 +353,47 @@
 
   try {
     const config = await fetchJson("./config.json");
-    const { owner, repo, site: siteConfig, page, links } = config;
+    const { owner, repo, sites: siteConfigs, page, links } = config;
     const rawBase = `https://raw.githubusercontent.com/${owner}/${repo}/HEAD`;
 
-    const [summary, historyText] = await Promise.all([
-      fetchJson(`${rawBase}/history/summary.json`),
-      fetchText(`${rawBase}/history/${siteConfig.slug}.yml`).catch(() => ""),
-    ]);
+    const summary = await fetchJson(`${rawBase}/history/summary.json`);
 
-    const siteSummary =
-      summary.find((s) => s.slug === siteConfig.slug) || {};
-    const history = historyText ? parseFlatYaml(historyText) : {};
+    const sites = await Promise.all(
+      siteConfigs.map(async (siteConfig) => {
+        const historyText = await fetchText(
+          `${rawBase}/history/${siteConfig.slug}.yml`
+        ).catch(() => "");
 
-    const days = buildDailyBars(siteSummary.dailyMinutesDown, history.startTime);
-    const uptime90d = computeRealUptime(days, siteSummary.dailyMinutesDown);
+        const siteSummary =
+          summary.find((s) => s.slug === siteConfig.slug) || {};
+        const history = historyText ? parseFlatYaml(historyText) : {};
 
-    const site = {
-      name: siteConfig.name,
-      url: siteConfig.url,
-      status: history.status || siteSummary.status || "up",
-      lastUpdated: history.lastUpdated || null,
-      uptime90d,
-      days,
-    };
+        const days = buildDailyBars(
+          siteSummary.dailyMinutesDown,
+          history.startTime
+        );
+        const uptime90d = computeRealUptime(days, siteSummary.dailyMinutesDown);
+
+        return {
+          name: siteConfig.name,
+          url: siteConfig.url,
+          status: history.status || siteSummary.status || "up",
+          lastUpdated: history.lastUpdated || null,
+          uptime90d,
+          days,
+        };
+      })
+    );
 
     renderNav(page.navbar);
-    renderHero(site, links);
-    renderServices(site);
+    renderHero(sites, links);
+    renderServices(sites);
     document.getElementById("footer-message").textContent = page.introMessage;
 
     const incidents = await loadIncidents({
       owner,
       repo,
-      siteName: siteConfig.name,
+      siteNames: siteConfigs.map((siteConfig) => siteConfig.name),
     });
     renderIncidents(incidents);
   } catch (error) {

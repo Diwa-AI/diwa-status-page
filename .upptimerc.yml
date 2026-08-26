@@ -15,15 +15,22 @@ repo: diwa-status
 # The Status Page.pdf mockup (DIWA-543) also shows "Web App & Dashboard"
 # (app.diwa.ai), "API" (api.diwa.ai), and three AI pipeline stages (AI
 # Analysis Engine, Highlight Reel Processing, Transcription Service).
-# Intentionally NOT added yet:
-#   - app.diwa.ai / api.diwa.ai currently have no public DNS record, so
-#     Upptime can't check them (would just show as permanently down).
+# Notes on what's checked and how:
+#   - app.diwa.ai / api.diwa.ai still have no public DNS record, so there's
+#     no dedicated subdomain to check yet. The Rails app (diwa_ai) serves
+#     the marketing site, dashboard, and API from the same www.diwa.ai host
+#     (see config/environments/production.rb's APP_HOST default), so "Diwa
+#     API" below is checked via its public health route on that host
+#     (/api/v1/health) until api.diwa.ai gets its own DNS record.
 #   - The AI pipeline stages are internal processing components with no
 #     public HTTP endpoint, and are an explicit v1 non-goal in TICKET.md.
-# Once a subdomain goes live, add it here as a new `sites` entry.
+# Once a dedicated subdomain goes live, switch the relevant entry's `url`
+# to it (e.g. api.diwa.ai) rather than the /api/v1/health path.
 sites:
-  - name: Marketing Website
+  - name: Diwa AI
     url: https://www.diwa.ai
+  - name: Diwa API
+    url: https://www.diwa.ai/api/v1/health
 
 # Status website settings (the static page generated on the gh-pages branch).
 status-website:

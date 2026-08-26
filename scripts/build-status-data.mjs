@@ -52,23 +52,23 @@ async function githubRequest(pathname, token) {
 // Upptime opens issues titled "🛑 {name} is down" or "⚠️ {name} has degraded
 // performance", and closes them automatically on recovery. See
 // upptime/uptime-monitor's src/update.ts. There is no dedicated label by
-// default, so we match on title.
-function isIncidentIssue(issue, siteName) {
+// default, so we match on title, against any of the monitored site names.
+function isIncidentIssue(issue, siteNames) {
   const title = issue.title || "";
   return (
-    title.includes(siteName) &&
+    siteNames.some((name) => title.includes(name)) &&
     (title.includes("is down") || title.includes("has degraded performance"))
   );
 }
 
-async function buildIncidentsForFeed({ owner, repo, siteName, token }) {
+async function buildIncidentsForFeed({ owner, repo, siteNames, token }) {
   const issues = await githubRequest(
     `/repos/${owner}/${repo}/issues?state=all&per_page=50`,
     token
   );
   if (!issues) return [];
   return issues
-    .filter((issue) => isIncidentIssue(issue, siteName))
+    .filter((issue) => isIncidentIssue(issue, siteNames))
     .map((issue) => ({
       title: issue.title,
       url: issue.html_url,
@@ -128,15 +128,14 @@ ${items}
 async function main() {
   const config = await readYaml(".upptimerc.yml");
   const { owner, repo } = config;
-  const site = config.sites[0]; // v1: exactly one real, checkable service
-  const slug = slugify(site.name);
+  const sites = config.sites; // v1: a small, fixed list of real, checkable services
   const websiteConfig = config["status-website"] || {};
 
   const token = process.env.GH_PAT || process.env.GITHUB_TOKEN;
   const incidents = await buildIncidentsForFeed({
     owner,
     repo,
-    siteName: site.name,
+    siteNames: sites.map((site) => site.name),
     token,
   });
 
@@ -144,11 +143,11 @@ async function main() {
     generatedAt: new Date().toISOString(),
     owner,
     repo,
-    site: {
+    sites: sites.map((site) => ({
       name: site.name,
       url: site.url,
-      slug,
-    },
+      slug: slugify(site.name),
+    })),
     page: {
       name: websiteConfig.name || "Status",
       introMessage: websiteConfig.introMessage || "",
@@ -182,7 +181,9 @@ async function main() {
   );
 
   console.log(
-    `Built status page shell for ${site.name} (${incidents.length} incidents in feed) -> ${OUT_DIR}`
+    `Built status page shell for ${sites
+      .map((site) => site.name)
+      .join(", ")} (${incidents.length} incidents in feed) -> ${OUT_DIR}`
   );
 }
 
