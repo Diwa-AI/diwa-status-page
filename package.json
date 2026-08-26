@@ -1,0 +1,12 @@
+{
+  "name": "diwa-status",
+  "private": true,
+  "type": "module",
+  "description": "Build script for the custom Diwa AI status page, fed by Upptime's generated data.",
+  "scripts": {
+    "build": "node scripts/build-status-data.mjs"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0"
+  }
+}

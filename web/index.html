@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Diwa AI Status</title>
+    <meta
+      name="description"
+      content="Live status and uptime history for Diwa AI's public services."
+    />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <a class="brand" href="https://www.diwa.ai" id="brand-link">
+          <img class="brand-logo" src="./assets/diwa-logo.png" alt="Diwa AI" />
+          <span class="brand-divider" aria-hidden="true"></span>
+          <span class="brand-title">Status</span>
+        </a>
+        <nav class="topbar-nav" id="topbar-nav"></nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="hero">
+        <div class="hero-icon" id="hero-icon" aria-hidden="true"></div>
+        <h1 class="hero-title" id="hero-title">Checking status&hellip;</h1>
+        <p class="hero-subtitle" id="hero-subtitle"></p>
+        <div class="uptime-pill" id="uptime-pill"></div>
+        <div class="hero-actions">
+          <a class="pill-button" id="rss-button" href="./feed.xml">
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+              <path
+                fill="currentColor"
+                d="M4 4a1 1 0 000 2 14 14 0 0114 14 1 1 0 002 0A16 16 0 004 4zm0 6a1 1 0 000 2 8 8 0 018 8 1 1 0 002 0 10 10 0 00-10-10zm2 6a2 2 0 100 4 2 2 0 000-4z"
+              />
+            </svg>
+            Subscribe via RSS
+          </a>
+          <a class="pill-button" id="github-button" href="#" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+              <path
+                fill="currentColor"
+                d="M12 2a10 10 0 00-3.16 19.5c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02a9.55 9.55 0 015 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.35 4.68-4.58 4.93.36.31.68.92.68 1.85v2.75c0 .26.18.57.69.48A10 10 0 0012 2z"
+              />
+            </svg>
+            Watch on GitHub
+          </a>
+        </div>
+      </section>
+
+      <section class="card services" id="services"></section>
+
+      <section class="incidents-section">
+        <h2 class="section-title">Past incidents</h2>
+        <div id="incidents"></div>
+      </section>
+
+      <footer class="footer">
+        <p id="footer-message"></p>
+        <a href="https://www.diwa.ai" class="back-link">&larr; Back to diwa.ai</a>
+      </footer>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
