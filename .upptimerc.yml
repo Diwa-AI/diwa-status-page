@@ -1,12 +1,12 @@
 # Upptime configuration for the Diwa AI public status page.
 #
-# This is the live config for the jasper-diwa-ai/diwa-status repo: the
+# This is the live config for the diwa-ai/diwa-status-page repo: the
 # `.github/workflows/*.yml` files read this to run checks, build the status
 # site, and update README.md/history/api/graphs. Edit this file and push -
 # no other setup is required.
 
-owner: jasper-diwa-ai
-repo: diwa-status
+owner: diwa-ai
+repo: diwa-status-page
 
 # Endpoints to monitor. v1 only checks external, customer-facing URLs that
 # actually have a live, public address today - no internal component
@@ -34,7 +34,7 @@ sites:
 
 # Status website settings (the static page generated on the gh-pages branch).
 status-website:
-  baseUrl: /diwa-status
+  baseUrl: /
   name: Diwa AI Status
   navbar:
     - title: diwa.ai
